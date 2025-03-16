@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uni Prep - Portfolio Analysis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+        
+        /* Navigation */
+        nav {
+            background-color: #4f46e5;
+            padding: 1rem 1.5rem;
+            color: white;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: #c7d2fe;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: white;
+        }
+        
+        .nav-links .signup {
+            background-color: #4338ca;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            color: white;
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            color: #1f2937;
+        }
+        
+        .university-selector {
+            display: flex;
+            align-items: center;
+        }
+        
+        .university-selector span {
+            color: #4f46e5;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+        
+        .university-selector select {
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        /* Portfolio Upload */
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .upload-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .upload-grid label {
+            display: block;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-grid textarea {
+            width: 100%;
+            height: 10rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .button {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .button:hover {
+            background-color: #4338ca;
+        }
+        
+        .upload-grid .button {
+            margin-top: 1rem;
+        }
+        
+        /* Results Section */
+        .results-overview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .score-container {
+            flex: 1;
+        }
+        
+        .score-container p {
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        
+        .score-display {
+            display: flex;
+            align-items: center;
+        }
+        
+        .score-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        
+        .score-percentile {
+            margin-left: 1rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .chart-container {
+            width: 33%;
+            height: 200px;
+        }
+        
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .category-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .category-card h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .score-badge {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .grade-circle {
+            width: 3rem;
+            height: 3rem;
+            background-color: #ede9fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4f46e5;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .progress-bar {
+            height: 0.5rem;
+            width: 12rem;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #4f46e5;
+            border-radius: 9999px;
+        }
+        
+        .feedback-list {
+            list-style-type: none;
+        }
+        
+        .feedback-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        
+        .feedback-icon {
+            margin-right: 0.5rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        .positive-icon {
+            color: #10b981;
+        }
+        
+        .negative-icon {
+            color: #ef4444;
+        }
+        
+        .suggestion-icon {
+            color: #3b82f6;
+        }
+        
+        /* Improvement Areas */
+        .improvement-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .improvement-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .improvement-card {
+            background-color: #ede9fe;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ddd6fe;
+        }
+        
+        .improvement-badge {
+            display: flex;
+            align-items: center;
+        }
+        
+        .improvement-number {
+            background-color: #e0e7ff;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-right: 0.75rem;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4f46e5;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Uni Prep</div>
+            <div class="nav-links">
+                <a href="#">Dashboard</a>
+                <a href="#">My Portfolio</a>
+                <a href="#">Universities</a>
+                <a href="#" class="signup">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="header">
+            <h1>Portfolio Analysis Dashboard</h1>
+            <div class="university-selector">
+                <span>Target University:</span>
+                <select id="university-select">
+                    <option value="harvard">Harvard University</option>
+                    <option value="stanford">Stanford University</option>
+                    <option value="mit">MIT</option>
+                    <option value="yale">Yale University</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Portfolio Upload Section (Shown initially) -->
+        <div id="upload-section" class="card">
+            <h2>Upload Your Portfolio</h2>
+            <div class="upload-grid">
+                <div>
+                    <label>Resume/CV</label>
+                    <textarea id="resume-input" placeholder="Paste your resume content here..."></textarea>
+                </div>
+                <div>
+                    <label>Extracurricular Activities</label>
+                    <textarea id="activities-input" placeholder="List your extracurricular activities..."></textarea>
+                </div>
+            </div>
+            <div>
+                <button id="analyze-btn" class="button">Analyze My Portfolio</button>
+            </div>
+        </div>
+
+        <!-- Loading Spinner (Hidden initially) -->
+        <div id="loading-section" class="card" style="display: none;">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <p style="text-align: center; margin-top: 1rem;">Analyzing your portfolio...</p>
+        </div>
+
+        <!-- Results Section (Hidden initially) -->
+        <div id="results-section" style="display: none;">
+            <!-- Overall Score -->
+            <div class="card">
+                <h2>Analysis Results</h2>
+                <div class="results-overview">
+                    <div class="score-container">
+                        <p id="compatibility-text">Your portfolio's compatibility with Harvard University:</p>
+                        <div class="score-display">
+                            <div id="score-value" class="score-value">72%</div>
+                            <div id="score-percentile" class="score-percentile">Higher than 65% of applicants</div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="radar-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="category-grid">
+                <!-- Academic Strength -->
+                <div class="card category-card">
+                    <h3>Academic Strength</h3>
+                    <div class="score-badge">
+                        <div id="academic-grade" class="grade-circle">B+</div>
+                        <div>
+                            <div class="progress-bar">
+                                <div id="academic-progress" class="progress-fill" style="width: 80%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul id="academic-feedback" class="feedback-list">
+                        <li class="feedback-item">
+                            <svg class="feedback-icon positive-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Strong GPA and course rigor
+                        </li>
+                        <li class="feedback-item">
+                            <svg class="feedback-icon negative-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Consider adding more AP/IB courses
+                        </li>
+                        <li class="feedback-item">
+                            <svg class="feedback-icon suggestion-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Add academic competitions or research
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Extracurricular Activities -->
+                <div class="card category-card">
+                    <h3>Extracurricular Activities</h3>
+                    <div class="score-badge">
+                        <div id="extracurricular-grade" class="grade-circle">A-</div>
+                        <div>
+                            <div class="progress-bar">
+                                <div id="extracurricular-progress" class="progress-fill" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul id="extracurricular-feedback" class="feedback-list">
+                        <li class="feedback-item">
+                            <svg class="feedback-icon positive-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Good leadership roles
+                        </li>
+                        <li class="feedback-item">
+                            <svg class="feedback-icon positive-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Consistent commitment to activities
+                        </li>
+                        <li class="feedback-item">
+                            <svg class="feedback-icon suggestion-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Consider more community service
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Improvement Areas -->
+            <div class="card">
+                <h3>Key Areas for Improvement</h3>
+                <div id="improvement-areas" class="improvement-grid">
+                    <div class="improvement-card">
+                        <div class="improvement-badge">
+                            <div class="improvement-number">1</div>
+                            <span>Research experience</span>
+                        </div>
+                    </div>
+                    <div class="improvement-card">
+                        <div class="improvement-badge">
+                            <div class="improvement-number">2</div>
+                            <span>STEM competitions</span>
+                        </div>
+                    </div>
+                    <div class="improvement-card">
+                        <div class="improvement-badge">
+                            <div class="improvement-number">3</div>
+                            <span>Community service hours</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const universitySelect = document.getElementById('university-select');
+        const resumeInput = document.getElementById('resume-input');
+        const activitiesInput = document.getElementById('activities-input');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const uploadSection = document.getElementById('upload-section');
+        const loadingSection = document.getElementById('loading-section');
+        const resultsSection = document.getElementById('results-section');
+        const compatibilityText = document.getElementById('compatibility-text');
+        const scoreValue = document.getElementById('score-value');
+        const scorePercentile = document.getElementById('score-percentile');
+        const academicGrade = document.getElementById('academic-grade');
+        const academicProgress = document.getElementById('academic-progress');
+        const academicFeedback = document.getElementById('academic-feedback');
+        const extracurricularGrade = document.getElementById('extracurricular-grade');
+        const extracurricularProgress = document.getElementById('extracurricular-progress');
+        const extracurricularFeedback = document.getElementById('extracurricular-feedback');
+        const improvementAreas = document.getElementById('improvement-areas');
+        
+        // Chart instance
+        let radarChart;
+        
+        // Event Listeners
+        analyzeBtn.addEventListener('click', handleAnalyze);
+        universitySelect.addEventListener('change', function() {
+            if (resultsSection.style.display !== 'none') {
+                updateUniversityInResults();
+            }
+        });
+        
+        // Sample data for demo
+        const sampleData = {
+            harvard: {
+                overallScore: 72,
+                percentile: 65,
+                categories: {
+                    academic: {
+                        score: 'B+',
+                        percentage: 80,
+                        feedback: [
+                            { type: 'positive', text: 'Strong GPA of 3.8' },
+                            { type: 'negative', text: 'Consider adding more AP/IB courses' },
+                            { type: 'suggestion', text: 'Adding research experience would strengthen your application' }
+                        ]
+                    },
+                    extracurricular: {
+                        score: 'A-',
+                        percentage: 85,
+                        feedback: [
+                            { type: 'positive', text: 'Strong leadership demonstrated in 3 roles' },
+                            { type: 'positive', text: 'Impressive community service commitment (200+ hours)' },
+                            { type: 'suggestion', text: 'Consider joining academic competitions' }
+                        ]
+                    }
+                },
+                improvementAreas: [
+                    'Research experience',
+                    'Academic competitions',
+                    'International exposure'
+                ],
+                comparisonData: {
+                    labels: ['Academics', 'Activities', 'Leadership', 'Service', 'Unique factors'],
+                    userData: [80, 85, 65, 80, 75],
+                    acceptedAverage: [85, 80, 75, 70, 80]
+                }
+            },
+            stanford: {
+                overallScore: 68,
+                percentile: 57,
+                categories: {
+                    academic: {
+                        score: 'B',
+                        percentage: 75,
+                        feedback: [
+                            { type: 'positive', text: 'Solid GPA of 3.7' },
+                            { type: 'negative', text: 'Need more technical/STEM coursework' },
+                            { type: 'suggestion', text: 'Consider pursuing research with a professor' }
+                        ]
+                    },
+                    extracurricular: {
+                        score: 'B+',
+                        percentage: 80,
+                        feedback: [
+                            { type: 'positive', text: 'Good leadership roles' },
+                            { type: 'negative', text: 'Stanford values technical projects and startups' },
+                            { type: 'suggestion', text: 'Consider building a technical project or innovation' }
+                        ]
+                    }
+                },
+                improvementAreas: [
+                    'Technical projects',
+                    'Research experience',
+                    'Entrepreneurial activities'
+                ],
+                comparisonData: {
+                    labels: ['Academics', 'Activities', 'Leadership', 'Innovation', 'Technical skills'],
+                    userData: [75, 80, 65, 60, 70],
+                    acceptedAverage: [80, 75, 75, 85, 85]
+                }
+            },
+            mit: {
+                overallScore: 64,
+                percentile: 52,
+                categories: {
+                    academic: {
+                        score: 'B-',
+                        percentage: 70,
+                        feedback: [
+                            { type: 'positive', text: 'Good academic record' },
+                            { type: 'negative', text: 'MIT expects exceptional math/science performance' },
+                            { type: 'suggestion', text: 'Participate in math/science olympiads' }
+                        ]
+                    },
+                    extracurricular: {
+                        score: 'B',
+                        percentage: 75,
+                        feedback: [
+                            { type: 'positive', text: 'Consistent commitment to activities' },
+                            { type: 'negative', text: 'Need more hands-on technical projects' },
+                            { type: 'suggestion', text: 'Build something! MIT values makers and builders' }
+                        ]
+                    }
+                },
+                improvementAreas: [
+                    'Technical projects',
+                    'Math/Science competitions',
+                    'Research in STEM fields'
+                ],
+                comparisonData: {
+                    labels: ['Academics', 'Technical skills', 'Research', 'Innovation', 'Problem-solving'],
+                    userData: [70, 60, 50, 65, 75],
+                    acceptedAverage: [90, 85, 75, 80, 85]
+                }
+            },
+            yale: {
+                overallScore: 78,
+                percentile: 74,
+                categories: {
+                    academic: {
+                        score: 'A-',
+                        percentage: 85,
+                        feedback: [
+                            { type: 'positive', text: 'Strong academic record with varied courses' },
+                            { type: 'positive', text: 'Good balance of subjects' },
+                            { type: 'suggestion', text: 'Consider more humanities/writing focused activities' }
+                        ]
+                    },
+                    extracurricular: {
+                        score: 'B+',
+                        percentage: 80,
+                        feedback: [
+                            { type: 'positive', text: 'Good leadership demonstrated' },
+                            { type: 'positive', text: 'Community service involvement is strong' },
+                            { type: 'suggestion', text: 'Yale values intellectual vitality and community impact' }
+                        ]
+                    }
+                },
+                improvementAreas: [
+                    'Writing experience',
+                    'Community impact projects',
+                    'Unique perspective development'
+                ],
+                comparisonData: {
+                    labels: ['Academics', 'Community impact', 'Leadership', 'Writing', 'Unique perspective'],
+                    userData: [85, 80, 65, 70, 75],
+                    acceptedAverage: [85, 75, 75, 80, 85]
+                }
+            }
+        };
+        
+        // Function to handle analyze button click
+        function handleAnalyze() {
+            // Validate inputs
+            if (!resumeInput.value.trim() || !activitiesInput.value.trim()) {
+                alert('Please fill in both fields');
+                return;
+            }
+            
+            // Show loading state
+            uploadSection.style.display = 'none';
+            loadingSection.style.display = 'block';
+            
+            // Simulate API call with timeout
+            setTimeout(() => {
+                loadingSection.style.display = 'none';
+                resultsSection.style.display = 'block';
+                
+                // Get the selected university data
+                const universityData = sampleData[universitySelect.value];
+                
+                // Update the UI with results
+                updateResults(universityData);
+            }, 2000);
+        }
+        
+        // Function to update university in results
+        function updateUniversityInResults() {
+            const universityData = sampleData[universitySelect.value];
+            updateResults(universityData);
+        }
+        
+        // Function to update results based on university data
+        function updateResults(data) {
+            // Update university name
+            const universityName = getUniversityName(universitySelect.value);
+            compatibilityText.textContent = `Your portfolio's compatibility with ${universityName}:`;
+            
+            // Update score and percentile
+            scoreValue.textContent = `${data.overallScore}%`;
+            scorePercentile.textContent = `Higher than ${data.percentile}% of applicants`;
+            
+            // Update academic section
+            const academic = data.categories.academic;
+            academicGrade.textContent = academic.score;
+            academicProgress.style.width = `${academic.percentage}%`;
+            
+            // Clear and rebuild academic feedback
+            academicFeedback.innerHTML = '';
+            academic.feedback.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'feedback-item';
+                
+                const icon = document.createElement('svg');
+                icon.className = `feedback-icon ${getFeedbackIconClass(item.type)}`;
+                icon.setAttribute('fill', 'none');
+                icon.setAttribute('viewBox', '0 0 24 24');
+                icon.setAttribute('stroke', 'currentColor');
+                
+                const path = document.createElement('path');
+                path.setAttribute('stroke-linecap', 'round');
+                path.setAttribute('stroke-linejoin', 'round');
+                path.setAttribute('stroke-width', '2');
+                path.setAttribute('d', getFeedbackIconPath(item.type));
+                
+                icon.appendChild(path);
+                li.appendChild(icon);
+                li.appendChild(document.createTextNode(item.text));
+                
+                academicFeedback.appendChild(li);
+            });
+            
+            // Update extracurricular section
+            const extracurricular = data.categories.extracurricular;
+            extracurricularGrade.textContent = extracurricular.score;
+            extracurricularProgress.style.width = `${extracurricular.percentage}%`;
+            
+            // Clear and rebuild extracurricular feedback
+            extracurricularFeedback.innerHTML = '';
+            extracurricular.feedback.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'feedback-item';
+                
+                const icon = document.createElement('svg');
+                icon.className = `feedback-icon ${getFeedbackIconClass(item.type)}`;
+                icon.setAttribute('fill', 'none');
+                icon.setAttribute('viewBox', '0 0 24 24');
+                icon.setAttribute('stroke', 'currentColor');
+                
+                const path = document.createElement('path');
+                path.setAttribute('stroke-linecap', 'round');
+                path.setAttribute('stroke-linejoin', 'round');
+                path.setAttribute('stroke-width', '2');
+                path.setAttribute('d', getFeedbackIconPath(item.type));
+                
+                icon.appendChild(path);
+                li.appendChild(icon);
+                li.appendChild(document.createTextNode(item.text));
+                
+                extracurricularFeedback.appendChild(li);
+            });
+            
+            // Clear and rebuild improvement areas
+            improvementAreas.innerHTML = '';
+            data.improvementAreas.forEach((area, index) => {
+                const div = document.createElement('div');
+                div.className = 'improvement-card';
+                
+                const badge = document.createElement('div');
+                badge.className = 'improvement-badge';
+                
+                const number = document.createElement('div');
+                number.className = 'improvement-number';
+                number.textContent = index + 1;
+                
+                const span = document.createElement('span');
+                span.textContent = area;
+                
+                badge.appendChild(number);
+                badge.appendChild(span);
+                div.appendChild(badge);
+                
+                improvementAreas.appendChild(div);
+            });
+            
+            // Update chart
+            updateRadarChart(data.comparisonData);
+        }
+        
+        // Function to update the radar chart
+        function updateRadarChart(chartData) {
+            const ctx = document.getElementById('radar-chart').getContext('2d');
+            
+            // Destroy previous chart if exists
+            if (radarChart) {
+                radarChart.destroy();
+            }
+            
+            // Create new chart
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: 'Your Portfolio',
+                            data: chartData.userData,
+                            backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                            borderColor: 'rgba(99, 102, 241, 1)',
+                            pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(99, 102, 241, 1)'
+                        },
+                        {
+                            label: 'Accepted Students Average',
+                            data: chartData.acceptedAverage,
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                            pointBorderColor: '#fff',
+                            pointH
